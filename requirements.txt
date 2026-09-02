@@ -1,0 +1,7 @@
+smolagents[mcp]
+mcp[ws]>=1.10.1,<2
+openai
+python-dotenv
+numpy
+fastapi
+uvicorn
