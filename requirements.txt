@@ -5,3 +5,4 @@ python-dotenv
 numpy
 fastapi
 uvicorn
+requests

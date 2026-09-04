@@ -1,0 +1,152 @@
+[
+  {
+    "query": "How does requests send a simple HTTP GET request?",
+    "file": "api.py",
+    "line": 74
+  },
+  {
+    "query": "How does requests send an HTTP POST request with data?",
+    "file": "api.py",
+    "line": 117
+  },
+  {
+    "query": "the low-level function that constructs a Request from a method and url",
+    "file": "api.py",
+    "line": 24
+  },
+  {
+    "query": "the class that manages cookies and connection pooling across requests",
+    "file": "sessions.py",
+    "line": 395
+  },
+  {
+    "query": "how a Request is prepared into a PreparedRequest before sending",
+    "file": "sessions.py",
+    "line": 511
+  },
+  {
+    "query": "the send method that sends a PreparedRequest and returns a Response",
+    "file": "sessions.py",
+    "line": 752
+  },
+  {
+    "query": "the class that represents an HTTP response with status code and headers",
+    "file": "models.py",
+    "line": 730
+  },
+  {
+    "query": "how to read the raw bytes of a response body",
+    "file": "models.py",
+    "line": 1031
+  },
+  {
+    "query": "how to parse a response body into JSON",
+    "file": "models.py",
+    "line": 1087
+  },
+  {
+    "query": "raise an HTTPError when the response has an error status code",
+    "file": "models.py",
+    "line": 1140
+  },
+  {
+    "query": "the adapter that wraps urllib3 connection pooling for requests",
+    "file": "adapters.py",
+    "line": 158
+  },
+  {
+    "query": "how a urllib3 response is converted into a requests Response object",
+    "file": "adapters.py",
+    "line": 365
+  },
+  {
+    "query": "the Session method that constructs and sends a Request given a method and url",
+    "file": "sessions.py",
+    "line": 557
+  },
+  {
+    "query": "the get method on a Session object",
+    "file": "sessions.py",
+    "line": 655
+  },
+  {
+    "query": "close a session and release the connection pool",
+    "file": "sessions.py",
+    "line": 883
+  },
+  {
+    "query": "verify the server SSL certificate when connecting",
+    "file": "adapters.py",
+    "line": 307
+  },
+  {
+    "query": "how HTTP Basic authentication stores username and password",
+    "file": "auth.py",
+    "line": 92
+  },
+  {
+    "query": "the text property that returns the response content as a unicode string",
+    "file": "models.py",
+    "line": 1050
+  },
+  {
+    "query": "how the URL is prepared and validated with query params",
+    "file": "models.py",
+    "line": 481
+  },
+  {
+    "query": "the method that prepares the request headers",
+    "file": "models.py",
+    "line": 563
+  },
+  {
+    "query": "how Link headers are parsed into a dictionary",
+    "file": "models.py",
+    "line": 1123
+  },
+  {
+    "query": "how to mount a custom adapter for a URL prefix",
+    "file": "sessions.py",
+    "line": 888
+  },
+  {
+    "query": "how to find the adapter that handles a given URL",
+    "file": "sessions.py",
+    "line": 870
+  },
+  {
+    "query": "resolve redirects by following the Location header",
+    "file": "sessions.py",
+    "line": 186
+  },
+  {
+    "query": "the base class that all authentication handlers implement",
+    "file": "auth.py",
+    "line": 78
+  },
+  {
+    "query": "how HTTP Digest authentication works",
+    "file": "auth.py",
+    "line": 124
+  },
+  {
+    "query": "a mapping whose string keys are case-insensitive",
+    "file": "structures.py",
+    "line": 20
+  },
+  {
+    "query": "how the encoding is extracted from response headers",
+    "file": "utils.py",
+    "line": 569
+  },
+  {
+    "query": "how unreserved characters in a URI are re-quoted",
+    "file": "utils.py",
+    "line": 704
+  },
+  {
+    "query": "what the RequestsCookieJar class is used for",
+    "file": "cookies.py",
+    "line": 191
+  }
+]

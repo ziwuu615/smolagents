@@ -22,6 +22,31 @@ def tokenize(text: str) -> list[str]:
     return re.findall(r"[a-z0-9]+", text) + re.findall(r"[一-鿿]", text)
 
 
+def code_tokenize(text: str) -> list[str]:
+    """代码感知分词：把 camelCase / snake_case / PascalCase 标识符拆成子词。
+
+    普通 `tokenize` 先转小写再按 [a-z0-9]+ 整段匹配，会把 getUserById 直接压成
+    一个 token "getuserbyid"，丢失了大小写边界。这里先保留大小写切分，再拆：
+      getUserById  -> get / user / by / id
+      snake_case   -> snake / case
+      HTTPServer   -> http / server
+    这是「代码检索」区别于「文本检索」的关键，检索时能按子词命中。
+    """
+    tokens: list[str] = []
+    for raw in re.findall(r"[A-Za-z0-9]+", text):
+        # 先拆下划线 / 连字符分隔（snake_case / kebab-case）
+        for part in re.split(r"[_-]+", raw):
+            if not part:
+                continue
+            # 小写/数字 到 大写 的边界：getUserById -> get User By Id
+            part = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", part)
+            # 连续大写缩写到小写开头的边界：HTTPServer -> HTTP Server
+            part = re.sub(r"(?<=[A-Z])(?=[A-Z][a-z])", " ", part)
+            tokens.extend(part.lower().split())
+    tokens.extend(re.findall(r"[一-鿿]", text))  # 中文单字，与 tokenize 保持一致
+    return tokens
+
+
 class BM25:
     """Okapi BM25：k1 控制词频饱和，b 控制文档长度归一化。"""
 
