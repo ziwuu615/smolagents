@@ -1,0 +1,8 @@
+.venv/
+.git/
+__pycache__/
+*.pyc
+.env
+memory_store.json
+code_index.json
+trace.jsonl
