@@ -99,6 +99,29 @@ def cmd_ask_agent(args) -> None:
         print(f"\n[盲审意见] {verdict}")
 
 
+def cmd_ask_harness(args) -> None:
+    from harness import MiniAgent, StepLimitError, make_search_tool
+
+    index = load_or_build_index(args.repo, args.index)
+    if getattr(args, "dense", False):
+        from embedding import DashScopeEmbedder
+
+        index.build_dense(DashScopeEmbedder())
+    agent = MiniAgent(tools=[make_search_tool(index)], max_steps=args.max_steps)
+    try:
+        answer = agent.run(args.question)
+    except StepLimitError as e:
+        answer = f"(强停) {e}"
+    print(f"\n===== 回答（自研 MiniAgent）=====")
+    print(answer)
+    print(f"\n===== trace（{len(agent.trace)} 步）=====")
+    for t in agent.trace:
+        if t["action"] == "tool":
+            print(f"  Step{t['step']} [tool] {t['call']}")
+        else:
+            print(f"  Step{t['step']} [answer]")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="代码库/PR 智能问答")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -121,6 +144,14 @@ def main() -> None:
     p_agent.add_argument("--index", default="code_index.json", help="索引文件路径")
     p_agent.add_argument("--dense", action="store_true", help="启用稠密语义检索（需 QWEN_API_KEY）")
     p_agent.set_defaults(func=cmd_ask_agent)
+
+    p_h = sub.add_parser("ask_harness", help="自研 MiniAgent 问答（对照框架）")
+    p_h.add_argument("question", help="关于代码库的问题")
+    p_h.add_argument("--repo", help="仓库路径（首次索引时必需）")
+    p_h.add_argument("--index", default="code_index.json", help="索引文件路径")
+    p_h.add_argument("--dense", action="store_true", help="启用稠密语义检索（需 QWEN_API_KEY）")
+    p_h.add_argument("--max-steps", type=int, default=8, help="最大步数")
+    p_h.set_defaults(func=cmd_ask_harness)
 
     args = ap.parse_args()
     args.func(args)

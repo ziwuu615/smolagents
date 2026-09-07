@@ -21,8 +21,9 @@ smolagents/
 ├── code_index.py        # 【应用】AST 切块 + 代码索引（带 file:line）
 ├── index_repo.py        # 【应用】CLI：仓库 → code_index.json
 ├── github_mcp_server.py # 【应用】MCP server：GitHub Issue/PR 只读查询
-├── cli.py               # 【应用】端到端入口：ask / ask_pr / ask_agent
+├── cli.py               # 【应用】端到端入口：ask / ask_pr / ask_agent / ask_harness
 ├── agents.py            # 【应用】多智能体：Master-Worker + Critic 盲审
+├── harness.py           # 自研 MiniAgent：ReAct 循环 + Tool Calling（对照框架）
 ├── eval_benchmark.py    # 【应用】评测：Recall@k + 端到端准确率
 ├── benchmark/           # 【应用】评测标注集（code_qa.json + 说明）
 ├── trace.py             # 【应用】结构化 Trace（step_callbacks → JSONL 可观测）
