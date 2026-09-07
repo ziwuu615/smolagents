@@ -16,6 +16,8 @@ import json
 import os
 from pathlib import Path
 
+import numpy as np
+
 from retrieval import HybridRetriever, LLMReranker, code_tokenize
 
 # 噪音目录：不参与索引
@@ -130,6 +132,36 @@ class CodeIndex:
     @classmethod
     def from_repo(cls, repo, skip_tests: bool = False, embedder=None):
         return cls(ingest_repo(repo, skip_tests=skip_tests), embedder=embedder)
+
+    def build_dense(self, embedder, cache_path: str = "code_index_dense.npy",
+                    batch_size: int = 10) -> "CodeIndex":
+        """给所有 chunk 建稠密语义向量并缓存到 .npy（避免每次重跑都调 API）。
+
+        缓存命中且 chunk 数一致时直接加载；否则批量 embed 后落盘。
+        建好后 `search()` 会自动把稠密排名并入 RRF 融合（稀疏+稠密混合检索）。
+        """
+        corpus = [c["search_text"] for c in self.chunks]
+        self.retriever.dense = embedder  # 让 search() 能对 query 做稠密 embedding
+        cache = Path(cache_path)
+        if cache.exists():
+            try:
+                cached = np.load(cache_path)
+                if len(cached) == len(corpus):
+                    self.retriever.doc_dense = [np.asarray(v, dtype=float) for v in cached]
+                    print(f"[稠密] 复用缓存向量：{cache_path}（{len(cached)} 条）")
+                    return self
+            except Exception:
+                pass
+        print(f"[稠密] 计算 {len(corpus)} 条稠密向量（batch={batch_size}）...")
+        if hasattr(embedder, "embed_many"):
+            vecs = embedder.embed_many(corpus, batch_size=batch_size)
+        else:
+            vecs = [embedder.embed(t) for t in corpus]
+        mat = np.array(vecs, dtype=float)
+        np.save(cache_path, mat)
+        self.retriever.doc_dense = [np.asarray(v, dtype=float) for v in mat]
+        print(f"[稠密] 已缓存 → {cache_path}")
+        return self
 
     def search(self, query: str, top_k: int = 5) -> list[dict]:
         """检索并返回带 file:line + score 的候选（查询同样做 code_tokenize）。"""

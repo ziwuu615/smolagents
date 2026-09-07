@@ -55,6 +55,10 @@ def make_search_tool(index: CodeIndex):
 
 def cmd_ask(args) -> None:
     index = load_or_build_index(args.repo, args.index)
+    if getattr(args, "dense", False):
+        from embedding import DashScopeEmbedder
+
+        index.build_dense(DashScopeEmbedder())
     agent = CodeAgent(tools=[make_search_tool(index)], model=build_model())
     answer = agent.run(args.question)
     print("\n===== 回答 =====")
@@ -82,6 +86,10 @@ def cmd_ask_agent(args) -> None:
     from agents import build_code_qa_system, run_with_critic
 
     index = load_or_build_index(args.repo, args.index)
+    if getattr(args, "dense", False):
+        from embedding import DashScopeEmbedder
+
+        index.build_dense(DashScopeEmbedder())
     model = build_model()
     router, _, reviewer = build_code_qa_system(index, model)
     answer, rounds, verdict = run_with_critic(router, reviewer, args.question, max_rounds=2)
@@ -99,6 +107,7 @@ def main() -> None:
     p_ask.add_argument("question", help="关于代码库的问题")
     p_ask.add_argument("--repo", help="仓库路径（首次索引时必需）")
     p_ask.add_argument("--index", default="code_index.json", help="索引文件路径")
+    p_ask.add_argument("--dense", action="store_true", help="启用稠密语义检索（需 QWEN_API_KEY）")
     p_ask.set_defaults(func=cmd_ask)
 
     p_pr = sub.add_parser("ask_pr", help="PR 解析（走 GitHub MCP）")
@@ -110,6 +119,7 @@ def main() -> None:
     p_agent.add_argument("question", help="关于代码库的问题")
     p_agent.add_argument("--repo", help="仓库路径（首次索引时必需）")
     p_agent.add_argument("--index", default="code_index.json", help="索引文件路径")
+    p_agent.add_argument("--dense", action="store_true", help="启用稠密语义检索（需 QWEN_API_KEY）")
     p_agent.set_defaults(func=cmd_ask_agent)
 
     args = ap.parse_args()

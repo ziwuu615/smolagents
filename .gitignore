@@ -4,6 +4,7 @@ __pycache__/
 .env
 memory_store.json
 code_index.json
+code_index_dense.npy
 trace.jsonl
 .idea/
 .vscode/

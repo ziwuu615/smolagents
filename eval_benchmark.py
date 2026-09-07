@@ -7,7 +7,8 @@
 
 用法：
     python eval_benchmark.py                 # 用 benchmark/code_qa.json 跑 Recall@k
-    python eval_benchmark.py --rerank        # 对比 LLM 重排前后的 Recall（调 API）
+    python eval_benchmark.py --dense         # 对比稀疏 vs 稠密混合检索（需 QWEN_API_KEY）
+    python eval_benchmark.py --dense --rerank# 完整管线：稀疏 → 混合 → 混合+重排
     python eval_benchmark.py --e2e           # 追加端到端答案准确率（较慢、调 API）
     python eval_benchmark.py --suggest       # 从索引抽样打印 chunk，辅助人工标注
 
@@ -47,14 +48,21 @@ def _recall_row(label: str, search_fn, bench: list[dict], ks: list[int]) -> str:
     return f"{label:<16}" + "".join(f"{c:>12}" for c in cells)
 
 
-def run_recall_eval(index: CodeIndex, bench: list[dict], rerank: bool = False) -> str:
+def run_recall_eval(index: CodeIndex, bench: list[dict], rerank: bool = False,
+                    dense: bool = False) -> str:
     ks = [1, 3, 5]
     header = f"{'指标':<16}" + "".join(f"{'Recall@' + str(k):>12}" for k in ks)
-    lines = [header, _recall_row("代码检索", index.search, bench, ks)]
+    lines = [header, _recall_row("稀疏检索", index.search, bench, ks)]
+    if dense:
+        from embedding import DashScopeEmbedder
+
+        index.build_dense(DashScopeEmbedder())
+        lines.append(_recall_row("混合(+稠密)", index.search, bench, ks))
     if rerank:
+        label = "混合(+重排)" if dense else "稀疏(+重排)"
         lines.append(
             _recall_row(
-                "代码检索(+重排)",
+                label,
                 lambda q, top_k: index.search_reranked(q, top_k=top_k),
                 bench,
                 ks,
@@ -115,11 +123,17 @@ def suggest(index: CodeIndex, n: int = 20, seed: int = 0) -> None:
 
 
 def main() -> None:
+    try:  # Windows 控制台 GBK 会崩中文/重音，强制 UTF-8
+        import sys
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
     ap = argparse.ArgumentParser(description="代码库检索/问答评测")
     ap.add_argument("--index", default="code_index.json", help="索引文件")
     ap.add_argument("--benchmark", default="benchmark/code_qa.json", help="标注文件")
     ap.add_argument("--e2e", action="store_true", help="追加端到端答案准确率（调 API）")
     ap.add_argument("--rerank", action="store_true", help="对比 LLM 重排后的 Recall（调 API）")
+    ap.add_argument("--dense", action="store_true", help="加稠密语义向量（需 QWEN_API_KEY），对比混合检索 Recall")
     ap.add_argument("--suggest", action="store_true", help="抽样打印 chunk 辅助标注")
     args = ap.parse_args()
 
@@ -133,7 +147,7 @@ def main() -> None:
     bench = load_benchmark(args.benchmark)
     print(f"评测样本数：{len(bench)}")
     print("=" * 50)
-    print(run_recall_eval(index, bench, rerank=args.rerank))
+    print(run_recall_eval(index, bench, rerank=args.rerank, dense=args.dense))
     if args.e2e:
         print(run_e2e(index, bench))
 

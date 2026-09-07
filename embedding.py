@@ -74,6 +74,26 @@ class DashScopeEmbedder:
         )
         self.model_id = model_id
 
+    @staticmethod
+    def _norm(v: np.ndarray) -> np.ndarray:
+        """L2 归一化：使点积 = 余弦相似度，与 TfidfEmbedder 保持一致。"""
+        n = float(np.linalg.norm(v))
+        return v / n if n > 0 else v
+
     def embed(self, text: str) -> np.ndarray:
         r = self.client.embeddings.create(model=self.model_id, input=text)
-        return np.array(r.data[0].embedding, dtype=float)
+        return self._norm(np.array(r.data[0].embedding, dtype=float))
+
+    def embed_many(self, texts: list[str], batch_size: int = 10) -> list[np.ndarray]:
+        """批量 embed：一次 API 调用多段文本，大幅减少请求次数（给整库建向量用）。
+
+        OpenAI 兼容接口 input 传 list 时，返回的 data 按输入顺序一一对应。
+        注意：DashScope text-embedding-v3 单次 batch 上限为 10（超出报 400）。
+        """
+        out: list[np.ndarray] = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i:i + batch_size]
+            r = self.client.embeddings.create(model=self.model_id, input=batch)
+            data = r.data if isinstance(r.data, list) else [r.data]
+            out.extend(self._norm(np.array(d.embedding, dtype=float)) for d in data)
+        return out

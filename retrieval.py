@@ -112,7 +112,10 @@ class HybridRetriever:
         self.doc_vecs = [self.vector.embed(t) for t in corpus]
         self.doc_dense = None
         if self.dense is not None:
-            self.doc_dense = [self.dense.embed(t) for t in corpus]
+            if hasattr(self.dense, "embed_many"):
+                self.doc_dense = self.dense.embed_many(corpus)
+            else:
+                self.doc_dense = [self.dense.embed(t) for t in corpus]
 
     def bm25_only(self, query: str, top_k: int) -> list[int]:
         return np.argsort(-self.bm25.scores(query))[:top_k].tolist()
