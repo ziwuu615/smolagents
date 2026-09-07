@@ -115,7 +115,7 @@ reviewer（Critic 盲审）→ 返工（最多 2 轮）
 - **Self-Consistency**：多路采样 + 多数投票，降低单次采样随机误差。
 - **Reflexion**：生成 → 自我批判 → 反馈回下一轮，循环改进。
 
-## 后续可做（写进简历的演进方向）
+## 后续可做（Roadmap）
 
 1. 稠密向量已接入（通义 text-embedding-v3，解决跨语言检索）；下一步换本地 BGE-M3 免 API 依赖、接 FAISS 面向更大代码库。
 2. 用 OpenTelemetry 替代自建 JSONL trace，接入标准可观测平台；加 Redis 缓存。

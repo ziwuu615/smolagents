@@ -20,7 +20,7 @@ def calculator(expression: str) -> str:
     Args:
         expression: 要计算的算术表达式，例如 "3 * (2 + 5)"。
     """
-    # 只允许数字和基本运算符，禁止任意代码执行（安全收口，面试可讲的点）
+    # 只允许数字和基本运算符，禁止任意代码执行（安全收口）
     if not re.fullmatch(r"[0-9+\-*/().\s]+", expression):
         return "非法表达式：只允许数字和 + - * / ( ) ."
     try:

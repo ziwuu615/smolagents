@@ -5,7 +5,7 @@
 - code_search（worker）：代码库检索，输出带 file:line 的候选；
 - reviewer（worker，Critic）：独立盲审，只看到「任务 + 草稿答案」，不接触检索来源。
 
-对标参考简历「Master-Worker + Router 调度」与「Critic 盲审 + 有界返工」。
+对标业界「Master-Worker + Router 调度」与「Critic 盲审 + 有界返工」。
 """
 from smolagents import CodeAgent, tool
 

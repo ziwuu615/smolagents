@@ -26,7 +26,7 @@ def main():
     agent_a = CodeAgent(tools=memory_tools, model=model)
     agent_a.run(
         "请把以下信息记入长期记忆：用户叫小明，喜欢喝咖啡，"
-        "正在准备 AI Agent 应用工程师的实习面试。"
+        "正在学习机器学习。"
     )
     print("\n[存储层] memory_store.json 当前内容：")
     print(memory.list_all())
@@ -37,7 +37,7 @@ def main():
     print("[会话 B] 任务：回答关于用户的问题（会话 B 没有任何上下文）")
     print("=" * 60)
     agent_b = CodeAgent(tools=memory_tools, model=model)
-    answer = agent_b.run("用户叫什么名字？喜欢喝什么？正在准备什么面试？")
+    answer = agent_b.run("用户叫什么名字？喜欢喝什么？最近在学什么？")
     print("\n[会话 B 的最终回答]：")
     print(answer)
 

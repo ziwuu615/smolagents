@@ -1,7 +1,7 @@
 """结构化 Trace：用 smolagents 的 step_callbacks 钩子把每次运行落成 JSONL 日志。
 
 不侵入 Agent 内部：通过 step_callbacks 在每个 ActionStep 结束时记录
-step、工具调用、耗时、token，供评测统计与面试展示「可观测性」——每一步的代价都留痕。
+step、工具调用、耗时、token，供评测统计与「可观测性」展示——每一步的代价都留痕。
 
 用法：
     trace = TraceLogger("trace.jsonl")

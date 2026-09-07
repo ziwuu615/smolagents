@@ -1,6 +1,6 @@
 """自建 MCP Server：用官方 mcp SDK（FastMCP）暴露工具，走 stdio 协议。
 
-为什么值得做（面试可讲）：
+为什么值得做：
 - 用 @tool 注册的工具只能在 smolagents 内部用；
 - 用 MCP 暴露的工具，任何 MCP 客户端都能用（Claude Desktop、Cursor、其他 Agent 框架），
   因为 MCP 是「Agent 调用外部工具」的通用协议，与具体框架解耦。
